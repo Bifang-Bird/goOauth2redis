@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Bifang-Bird/goOauth2"
-	"github.com/Bifang-Bird/goOauth2models"
+	oauth2 "github.com/Bifang-Bird/goOauth2"
+	"github.com/Bifang-Bird/goOauth2/models"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
