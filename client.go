@@ -94,7 +94,8 @@ func (s *ClientStore) CreateClient(ctx context.Context, info oauth2.ClientInfo) 
 	pipe := s.cli.TxPipeline()
 
 	if code := info.GetID(); code != "" {
-		pipe.Set(ctx, s.wrapperKey(code), jv, 0)
+		key := CLIENT_INFO + code
+		pipe.Set(ctx, s.wrapperKey(key), jv, 0)
 	}
 
 	if _, err := pipe.Exec(ctx); err != nil {
@@ -104,7 +105,7 @@ func (s *ClientStore) CreateClient(ctx context.Context, info oauth2.ClientInfo) 
 }
 
 func (s *ClientStore) GetByID(ctx context.Context, key string) (oauth2.ClientInfo, error) {
-	result := s.cli.Get(ctx, s.wrapperKey(key))
+	result := s.cli.Get(ctx, s.wrapperKey(CLIENT_INFO+key))
 	return s.parseClient(result)
 }
 
@@ -130,6 +131,14 @@ func (s *ClientStore) parseClient(result *redis.StringCmd) (oauth2.ClientInfo, e
 	return &token, nil
 }
 
+func (s *ClientStore) RemoveClientInfoById(ctx context.Context, clientId string) error {
+	err := s.remove(ctx, CLIENT_INFO+clientId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *ClientStore) CreateClientPermission(ctx context.Context, clientId string, info []oauth2.ClientPermissionInfo) error {
 	jv, err := jsonMarshal(info)
 	if err != nil {
@@ -139,7 +148,7 @@ func (s *ClientStore) CreateClientPermission(ctx context.Context, clientId strin
 	pipe := s.cli.TxPipeline()
 
 	if code := clientId; code != "" {
-		pipe.Set(ctx, s.wrapperKey("permission:"+code), jv, 0)
+		pipe.Set(ctx, s.wrapperKey(CLIENT_PERMISSIONS+code), jv, 0)
 	}
 
 	if _, err := pipe.Exec(ctx); err != nil {
@@ -149,7 +158,7 @@ func (s *ClientStore) CreateClientPermission(ctx context.Context, clientId strin
 }
 
 func (s *ClientStore) GetPermissionByID(ctx context.Context, key string) ([]oauth2.ClientPermissionInfo, error) {
-	result := s.cli.Get(ctx, s.wrapperKey("permission:"+key))
+	result := s.cli.Get(ctx, s.wrapperKey(CLIENT_PERMISSIONS+key))
 	if ok, err := s.checkError(result); err != nil {
 		return nil, err
 	} else if ok {
