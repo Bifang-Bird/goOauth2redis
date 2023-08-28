@@ -246,63 +246,17 @@ func (s *TokenStore) GetByRefresh(ctx context.Context, refresh string) (oauth2.T
 }
 
 // Create Create and store the new token information
-func (s *TokenStore) CreateIps(ctx context.Context, info string) error {
-	ct := time.Now()
-	jv, err := jsonMarshal(info)
-	if err != nil {
-		return err
-	}
-
-	pipe := s.cli.TxPipeline()
-	pipe.Set(ctx, s.wrapperKey(code), jv, info.GetCodeExpiresIn())
-	if _, err := pipe.Exec(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Create Create and store the new client information
-func (s *TokenStore) CreateClient(ctx context.Context, info oauth2.ClientInfo) error {
-	jv, err := jsonMarshal(info)
-	if err != nil {
-		return err
-	}
-
-	pipe := s.cli.TxPipeline()
-
-	if code := info.GetID(); code != "" {
-		pipe.Set(ctx, s.wrapperKey(code), jv, 0)
-	}
-
-	if _, err := pipe.Exec(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *TokenStore) parseClient(result *redis.StringCmd) (oauth2.ClientInfo, error) {
-	if ok, err := s.checkError(result); err != nil {
-		return nil, err
-	} else if ok {
-		return nil, nil
-	}
-
-	buf, err := result.Bytes()
-	if err != nil {
-		if err == redis.Nil {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	var token models.Client
-	if err := jsonUnmarshal(buf, &token); err != nil {
-		return nil, err
-	}
-	return &token, nil
-}
-
-func (s *TokenStore) getClient(ctx context.Context, key string) (oauth2.ClientInfo, error) {
-	result := s.cli.Get(ctx, s.wrapperKey(key))
-	return s.parseClient(result)
-}
+//func (s *TokenStore) CreateIps(ctx context.Context, info string) error {
+//	ct := time.Now()
+//	jv, err := jsonMarshal(info)
+//	if err != nil {
+//		return err
+//	}
+//
+//	pipe := s.cli.TxPipeline()
+//	pipe.Set(ctx, s.wrapperKey(code), jv, info.GetCodeExpiresIn())
+//	if _, err := pipe.Exec(ctx); err != nil {
+//		return err
+//	}
+//	return nil
+//}
