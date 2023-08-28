@@ -3,7 +3,7 @@ module github.com/Bifang-Bird/goOauth2Redis
 go 1.13
 
 require (
-	github.com/Bifang-Bird/goOauth2 v1.0.2
+	github.com/Bifang-Bird/goOauth2 v1.1.0
 	github.com/go-redis/redis/v8 v8.0.0-beta.5
 	github.com/google/uuid v1.1.1
 	github.com/json-iterator/go v1.1.10
