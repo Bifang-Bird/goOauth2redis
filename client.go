@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+
 	oauth2 "github.com/Bifang-Bird/goOauth2"
 	"github.com/Bifang-Bird/goOauth2/models"
 	"github.com/go-redis/redis/v8"
@@ -127,6 +128,18 @@ func (s *ClientStore) parseClient(result *redis.StringCmd) (oauth2.ClientInfo, e
 	var token models.Client
 	if err := jsonUnmarshal(buf, &token); err != nil {
 		return nil, err
+	}
+	if token.GrantType == oauth2.PasswordCredentials {
+		return &models.ClientPassword{
+			ID:        token.ID,
+			Secret:    token.Secret,
+			Domain:    token.Domain,
+			Public:    token.Public,
+			UserID:    token.UserID,
+			Password:  token.Password,
+			Account:   token.Account,
+			GrantType: token.GetGrantType(),
+		}, nil
 	}
 	return &token, nil
 }
